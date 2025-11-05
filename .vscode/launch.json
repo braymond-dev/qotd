@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Run API + Web",
+      "configurations": ["Go: API", "Next.js: Web"]
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Go: API",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/api/cmd/server",
+      "env": {
+        "DATABASE_URL": "${env:DATABASE_URL}",
+        "OPENAI_API_KEY": "${env:OPENAI_API_KEY}",
+        "OPENAI_EMBED_MODEL": "text-embedding-3-small",
+        "OPENAI_GRADE_MODEL": "gpt-4o-mini",
+        "CRON_KEY": "${env:CRON_KEY}",
+        "ADDR": ":8080"
+      }
+    },
+    {
+      "name": "Next.js: Web",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "env": {
+        "NEXT_PUBLIC_API_BASE": "http://localhost:8080"
+      },
+      "port": 9229
+    }
+  ]
+}
+

@@ -1,0 +1,24 @@
+# Environment files
+.env
+.env.local
+
+# Node/Next.js artifacts
+web/node_modules/
+web/.next/
+web/package-lock.json
+
+# Go build artifacts
+api/bin/
+api/dist/
+api/vendor/
+
+# Editor/OS cruft
+.DS_Store
+Thumbs.db
+*.swp
+*.log
+
+# Coverage and generated data
+coverage/
+*.out
+

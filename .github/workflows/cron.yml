@@ -1,0 +1,18 @@
+name: Daily Question Cron
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call API to generate question
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          CRON_KEY: ${{ secrets.CRON_KEY }}
+        run: |
+          curl -sS -X POST "$API_URL/v1/admin/generate-today" -H "X-CRON-KEY: $CRON_KEY"
+

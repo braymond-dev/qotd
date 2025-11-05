@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  db:
+    image: ankane/pgvector:latest
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: qotd
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d qotd"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/qotd?sslmode=disable
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_EMBED_MODEL: ${OPENAI_EMBED_MODEL:-text-embedding-3-small}
+      OPENAI_GRADE_MODEL: ${OPENAI_GRADE_MODEL:-gpt-4o-mini}
+      CRON_KEY: ${CRON_KEY}
+      ADDR: :8080
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:

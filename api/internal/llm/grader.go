@@ -20,6 +20,7 @@ type Grader struct {
 type GradeResult struct {
 	Match  bool   `json:"match"`
 	Reason string `json:"reason"`
+	Choice string `json:"matched_choice"`
 }
 
 func NewGrader(apiKey, model string) *Grader {
@@ -43,14 +44,15 @@ func (g *Grader) Grade(ctx context.Context, answer string, choices []string) (Gr
 }
 
 func (g *Grader) buildPayload(answer string, choices []string) map[string]any {
-	sys := "You verify if a response matches any item in a list of acceptable answers. Return strict JSON only."
+	sys := "You verify if a response matches any exact item in a provided list of acceptable answers. Only acknowledge exact equivalence, never approximate matches. Return strict JSON only."
 	user := map[string]any{
 		"answer":       answer,
 		"choices":      choices,
-		"instructions": "Return match=true if the answer clearly references or is equivalent to any choice (aliases, spelling differences, abbreviations). Otherwise match=false. Always include a short reason.",
+		"instructions": "Return match=true only if the answer clearly references the same entity as one of the choices (allowing spelling/spacing variants). When match=true, set matched_choice to the exact string from the choices array. Reject other entities even if similar. Always provide a short reason.",
 		"output_format": map[string]any{
-			"match":  false,
-			"reason": "",
+			"match":          false,
+			"matched_choice": "",
+			"reason":         "",
 		},
 	}
 	return map[string]any{

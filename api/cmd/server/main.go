@@ -152,6 +152,24 @@ func (s *Server) handlePostAnswer(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusBadGateway, map[string]string{"error": "grading failed"})
 			return
 		}
+		if grade.Match {
+			matched := normalizeAnswer(grade.Choice)
+			valid := false
+			if matched != "" {
+				for _, c := range q.Choices {
+					if matched == normalizeAnswer(c) {
+						valid = true
+						break
+					}
+				}
+			}
+			if !valid {
+				grade.Match = false
+				if grade.Reason == "" {
+					grade.Reason = "LLM match rejected: alias not in list."
+				}
+			}
+		}
 		score := 0
 		feedback := grade.Reason
 		if feedback == "" {
